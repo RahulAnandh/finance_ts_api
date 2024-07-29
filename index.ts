@@ -43,6 +43,19 @@ app.get("/", (req: any, res: any) => {
   res.send("Welcome to typescript backend!");
 });
 
+app.get("/api/v1/login/create_table", async (req: any, res: any) => {
+  try {
+    // const tb_user = await pool.query(
+    //   "CREATE TABLE tb_user(id SERIAL ,user_name TEXT PRIMARY KEY,password TEXT,is_deleted BOOLEAN DEFAULT false)"
+    // );
+    // const tb_finance = await pool.query(
+    //   "CREATE TABLE tb_finance(id SERIAL ,finance_id TEXT PRIMARY KEY,town TEXT,city TEXT,district TEXT,state TEXT,is_deleted BOOLEAN DEFAULT false)"
+    // );
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Server Error");
+  }
+});
 app.post("/api/v1/login/create_table", async (req: any, res: any) => {
   console.log("request", req.body);
   try {
@@ -88,8 +101,89 @@ app.post("/api/v1/login/create_user", async (req: any, res: any) => {
     }
   }
 });
+app.get("/api/v1/finance/get_all", async (req: any, res: any) => {
+  try {
+    const query_not_deleted = `SELECT * FROM tb_finance WHERE is_deleted=false`;
+    const query_deleted = `SELECT * FROM tb_finance WHERE is_deleted=true`;
+
+    const result_not_deleted = await pool.query(query_not_deleted);
+    const result_deleted = await pool.query(query_deleted);
+
+    res.send({
+      not_deleted: result_not_deleted.rows,
+      deleted: result_deleted.rows,
+    });
+  } catch (err) {
+    if (err) {
+      console.error(err);
+      res.status(500).send("Server Error");
+    } else {
+      res.send({ message: "Server issue" });
+    }
+  }
+});
+
+app.post("/api/v1/finance/create_finance", async (req: any, res: any) => {
+  try {
+    const query = `INSERT INTO tb_finance (finance_id,town,city,district,state)VALUES ('${req.body.finance_id}','${req.body.town}','${req.body.city}','${req.body.district}','${req.body.state}')`;
+    const result = await pool.query(query);
+    res.send({ message: "Finance created succusfully." });
+  } catch (err) {
+    if (err) {
+      console.error(err);
+      res.status(500).send("Server Error");
+    } else {
+      res.send({ message: "Finance created succusfully." });
+    }
+  }
+});
+app.delete("/api/v1/finance/delete_finance/:id", async (req: any, res: any) => {
+  try {
+    const query = `UPDATE tb_finance SET is_deleted = true WHERE finance_id = '${req.params.id}'`;
+    const result = await pool.query(query);
+    res.send({ message: "Finance Deleted succusfully." });
+  } catch (err) {
+    if (err) {
+      console.error(err);
+      res.status(500).send("Server Error");
+    } else {
+      res.send({ message: "Finance Deleted succusfully." });
+    }
+  }
+});
+app.delete(
+  "/api/v1/finance/undo_delete_finance/:id",
+  async (req: any, res: any) => {
+    try {
+      const query = `UPDATE tb_finance SET is_deleted = false WHERE finance_id = '${req.params.id}'`;
+      const result = await pool.query(query);
+      res.send({ message: "Finance Redeployed succusfully." });
+    } catch (err) {
+      if (err) {
+        console.error(err);
+        res.status(500).send("Server Error");
+      } else {
+        res.send({ message: "Finance Redeployed succusfully." });
+      }
+    }
+  }
+);
+app.put("/api/v1/finance/update_finance/:id", async (req: any, res: any) => {
+  const { finance_id, town, city, district, state } = req.body;
+  try {
+    const query = `UPDATE tb_finance SET town='${town}',city='${city}',district='${district}',state='${state}' WHERE finance_id = '${finance_id}'`;
+    const result = await pool.query(query);
+    res.send({ message: "Finance Updated succusfully." });
+  } catch (err) {
+    if (err) {
+      console.error(err);
+      res.status(500).send("Server Error");
+    } else {
+      res.send({ message: "Finance Deleted succusfully." });
+    }
+  }
+});
 app.post("/api/v1/login/otp_verification", async (req: any, res: any) => {
-  console.log("1---A", req.body);
   try {
     const query = `SELECT * FROM tb_user WHERE user_name = '${req.body.mobile}'`;
     const result = await pool.query(query);
