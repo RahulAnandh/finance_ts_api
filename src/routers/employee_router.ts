@@ -24,8 +24,18 @@ employeeRouter.get("/get_all", async (req: Request, res: Response) => {
 });
 
 employeeRouter.post("/create_employee", async (req: Request, res: Response) => {
+  console.log("1---1", req.body);
+  const {
+    address,
+    date_of_birth,
+    first_name,
+    house_name,
+    last_name,
+    pin_code,
+    state,
+  } = req.body;
   try {
-    const query = `INSERT INTO tb_employee (employee_id,town,city,district,state)VALUES ('${req.body.employee_id}','${req.body.town}','${req.body.city}','${req.body.district}','${req.body.state}')`;
+    const query = `INSERT INTO tb_employee (first_name,last_name,date_of_birth,house_name,address,pin_code,state)VALUES ('${first_name}','${last_name}','${date_of_birth}','${house_name}','${address}','${pin_code}','${state}')`;
     const result = await pool.query(query);
     res.send({ message: "Employee created succusfully." });
   } catch (err) {
@@ -41,7 +51,7 @@ employeeRouter.delete(
   "/delete_employee/:id",
   async (req: Request, res: Response) => {
     try {
-      const query = `UPDATE tb_employee SET is_deleted = true WHERE employee_id = '${req.params.id}'`;
+      const query = `UPDATE tb_employee SET is_deleted = true WHERE id = '${req.params.id}'`;
       const result = await pool.query(query);
       res.send({ message: "Employee Deleted succusfully." });
     } catch (err) {
@@ -58,7 +68,7 @@ employeeRouter.delete(
   "/undo_delete_employee/:id",
   async (req: Request, res: any) => {
     try {
-      const query = `UPDATE tb_employee SET is_deleted = false WHERE eployee_id = '${req.params.id}'`;
+      const query = `UPDATE tb_employee SET is_deleted = false WHERE id = '${req.params.id}'`;
       const result = await pool.query(query);
       res.send({ message: "Employee Redeployed succusfully." });
     } catch (err) {
@@ -74,9 +84,18 @@ employeeRouter.delete(
 employeeRouter.put(
   "/update_employee/:id",
   async (req: Request, res: Response) => {
-    const { employee_id, town, city, district, state } = req.body;
+    const {
+      address,
+      date_of_birth,
+      first_name,
+      house_name,
+      id,
+      last_name,
+      pin_code,
+      state,
+    } = req.body;
     try {
-      const query = `UPDATE tb_employee SET town='${town}',city='${city}',district='${district}',state='${state}' WHERE employee_id = '${employee_id}'`;
+      const query = `UPDATE tb_employee SET first_name='${first_name}',last_name='${last_name}',date_of_birth='${date_of_birth}',address='${address}',house_name='${house_name}',pin_code='${pin_code}',state='${state}' WHERE id = '${req.params.id}'`;
       const result = await pool.query(query);
       res.send({ message: "Employee Updated succusfully." });
     } catch (err) {

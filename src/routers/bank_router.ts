@@ -54,7 +54,6 @@ bankRouter.delete("/delete_bank/:id", async (req: Request, res: Response) => {
   }
 });
 bankRouter.delete("/undo_delete_bank/:id", async (req: Request, res: any) => {
-  console.log("1---2", req.params);
   try {
     const query = `UPDATE tb_bank SET is_deleted = false WHERE id = '${req.params.id}'`;
     const result = await pool.query(query);

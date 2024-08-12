@@ -4,6 +4,7 @@ import bodyParser from "body-parser";
 require("crypto").randomBytes(64).toString("hex");
 import financeRouter from "./routers/finance_router";
 import bankRouter from "./routers/bank_router";
+import employeeRouter from "./routers/employee_router";
 
 var cors = require("cors");
 const { Pool } = require("pg");
@@ -88,7 +89,7 @@ app.post(
 );
 app.use("/api/v1/finance", financeRouter);
 app.use("/api/v1/bank", bankRouter);
-
+app.use("/api/v1/employee", employeeRouter);
 // Server setup
 app.listen(PORT, () => {
   console.log(
